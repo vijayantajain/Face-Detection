@@ -1,9 +1,9 @@
 """Module for detecting faces"""
 
-from os import path
-import os
-
 import argparse
+import imghdr
+import os
+from os import path
 
 CWD = os.getcwd()
 
@@ -39,13 +39,18 @@ def check_arguments(arguments):
 
     Raises
     ------
-    FileNotFoundError
+    AssertionError
         In case the file path is not a file
+    AssertionError
+        In case the image file is neither png/jpeg
     ArithmeticError
         In case the argument confidence is less than 0.0
     """
     if not path.isfile(arguments['image']):
-        raise FileNotFoundError('Path to the image is invalid')
+        raise AssertionError('Path to the image is invalid')
+
+    if imghdr.what(arguments['image']) not in ['png', 'jpeg']:
+        raise AssertionError('Image is neither png or jpeg')
 
     if arguments['confidence'] < 0:
         raise ArithmeticError('Confidence level should be greater than or equal to 0.00%')
