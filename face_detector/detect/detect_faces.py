@@ -133,3 +133,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+def detect_faces(image, confidence):
+    pass
