@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block container %}
+    <div class="card center">
+        <h3 class="card-header card-head-color white-text text-center card-heading">
+            <strong>Upload Image</strong>
+        </h3>
+
+        <div class="card-body">
+            <form action="/" method="POST" class="form-group" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+
+                <div class="md-form">
+                    <p><strong>Confidence value should be in the range [0.0, 1.0)</strong></p>
+                    {{ form.confidence(class="form-control floating-label", placeholder="Enter confidence")}}
+                </div>
+
+                <div class="form-row">
+                    <div class="file-field">
+                        {{ form.image.label }} {{ form.image(placeholder="Upload your file") }}
+                    </div>
+                </div>
+
+                <button type="submit" class="md-form btn btn-primary float-left">Submit</button>
+
+            </form>
+
+        </div>
+
+    </div>
+{% endblock %}

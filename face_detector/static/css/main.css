@@ -1,0 +1,39 @@
+.heading{
+    background-color: black;
+    color: white;
+    font-family: Cambria;
+    margin: 2%;
+    padding: 0.01%
+}
+
+.center{
+
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.para{
+    text-align: justify;
+    color: black;
+    font-size: 90%;
+    font-family: cursive;
+}
+
+.error{
+    margin: 2%;
+    padding: 0.01%;
+}
+
+img{
+    align-content: center;
+    margin: 2%;
+}
+
+.txt-ctr{
+    text-align: center;
+}
+
+.card-head-color{
+    background-color: black;
+}
