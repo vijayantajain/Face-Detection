@@ -2,13 +2,19 @@
 
 {% block container %}
     <div class="card center">
+
         <h3 class="card-header card-head-color white-text text-center card-heading">
             <strong>Upload Image</strong>
         </h3>
 
         <div class="card-body">
+            
             <form action="/" method="POST" class="form-group" enctype="multipart/form-data">
                 {{ form.csrf_token }}
+
+                <div class="alert-danger error">
+                    {% if form.confidence.errors %} {% for msgs in form.confidence.errors %} {{ msgs }} {% endfor %} {% endif %}
+                </div>
 
                 <div class="md-form">
                     <p><strong>Confidence value should be in the range [0.0, 1.0)</strong></p>

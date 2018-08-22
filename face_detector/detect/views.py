@@ -3,7 +3,7 @@
 import os
 from os import path
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, render_template, request
 from werkzeug.utils import secure_filename
 
 from face_detector.detect.forms import InputForm
@@ -18,9 +18,9 @@ detect_faces = Blueprint(__name__, 'detect_faces')
 
 @detect_faces.route('/', methods=['GET', 'POST'])
 def process_form():
-    """This function extracts the image
-    and the confidence from the http-request
-    and returns the image with faces drawn on it
+    """This function extracts the image and the confidence
+    from the http-request and returns the image with
+    bounding boxes around faces.
     """
     form = InputForm(request.form)
     if request.method == 'GET':
@@ -38,6 +38,22 @@ def process_form():
         confidence = form.confidence.data
         image_w_faces = get_faces(filename, confidence)
         return render_template('faces.html', filename=image_w_faces)
+
+    flash_errors(form)
+    return render_template('form.html', form=form)
+
+def flash_errors(form):
+    """Function for flashing errors for an invalid input in the form
+
+    Parameters
+    ----------
+    form : ProfileForm
+        Form object containing fields and errors
+
+    """
+    for fields, errors in form.errors.items():
+        for error in errors:
+            flash('Error in the field {} - {}'.format(getattr(form, fields).label.text, error))
 
 def allowed_extension(filename):
     """Checks the file name of the uploaded image

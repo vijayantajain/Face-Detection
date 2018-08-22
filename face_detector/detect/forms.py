@@ -13,5 +13,6 @@ class InputForm(FlaskForm):
     """
 
     confidence = FloatField(
-        'Confidence', [validators.DataRequired(), validators.NumberRange(min=0.0, max=0.999)])
+        'Confidence', [validators.DataRequired('Confidence is required and must be a float'),
+                       validators.NumberRange(min=0.0, max=0.999)])
     image = FileField('Upload an Image')
