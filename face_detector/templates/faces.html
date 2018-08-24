@@ -5,7 +5,7 @@
     <div class="card center">
 
         <h3 class="card-header card-head-color white-text text-center card-hading">
-            <strong>Faces detected!</strong>
+            <strong>{{ num_faces }} Face(s) detected!</strong>
         </h3>
 
         <img src='{{url_for('static', filename='images/' + filename)}}' class="center" alt="Detected Faces">
