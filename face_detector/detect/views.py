@@ -3,12 +3,12 @@
 import os
 from os import path
 
+import numpy as np
 from flask import Blueprint, flash, render_template, request
 from flask.views import MethodView
-from werkzeug.utils import secure_filename
 
+from face_detector.detect.detect_faces import get_img_w_faces, save_image
 from face_detector.detect.forms import InputForm, allowed_extension
-from face_detector.detect.detect_faces import get_faces
 
 CWD = os.getcwd()
 UPLOAD_FOLDER = path.join(CWD, 'face_detector', 'static', 'images')
@@ -50,7 +50,7 @@ class FormView(MethodView):
         the image and calls `get_faces` to get the image file
         containing the detected faces and the number of faces
         detected. It then returns the `render_template` function
-        which renders `faces.html` template with the requisite 
+        which renders `faces.html` template with the requisite
         context. In case the form input is not valid it 'flashes'
         the respective error and renders the 'form.html' template
 
@@ -61,18 +61,23 @@ class FormView(MethodView):
         """
 
         form = InputForm(request.form)
+
         if form.validate():
             try:
                 image = request.files['image']
-                if image and allowed_extension(image.filename):
-                    filename = secure_filename(image.filename)
-                    image.save(path.join(UPLOAD_FOLDER, filename))
-            except KeyError:
+                if allowed_extension(image.filename):
+                    confidence = form.confidence.data
+            except KeyError: # TODO - Raise validation error when no image is uploaded
                 filename = DEFAULT_IMAGE
+            image_w_faces, num_faces = get_img_w_faces(image, confidence)
 
-            confidence = form.confidence.data
-            image_w_faces, num_faces = get_faces(filename, confidence)
-            return render_template('faces.html', filename=image_w_faces, num_faces=num_faces)
+            #Save the image
+            (name, ext) = path.splitext(image.filename)
+            image_w_faces_filename = name + '_faces' + ext
+            save_image(image_w_faces, UPLOAD_FOLDER, image_w_faces_filename)
+
+            return render_template(
+                'faces.html', filename=image_w_faces_filename, num_faces=num_faces)
 
         self.flash_errors(form)
         return render_template('form.html', form=form)

@@ -4,6 +4,7 @@ import os
 from os import path
 
 import numpy as np
+from PIL import Image
 
 import cv2
 
@@ -12,7 +13,7 @@ PROTO_PATH = path.join(CWD, 'face_detector', 'model', 'deploy.prototxt.txt')
 MODEL_PATH = path.join(CWD, 'face_detector', 'model', 'res10_300x300_ssd_iter_140000.caffemodel')
 IMAGE_PATH = path.join(CWD, 'face_detector', 'static', 'images')
 
-def get_faces(image_name, confidence, image_w_faces='_faces'):
+def get_faces(img, confidence):
     """Returns the filename of image with bounding boxes around faces
     and the number of faces detected
 
@@ -23,7 +24,7 @@ def get_faces(image_name, confidence, image_w_faces='_faces'):
     confidence : float
         The threshold confidence above which to detect faces
     image_w_faces : str, optional
-        Phrase which is added to the original image filename 
+        Phrase which is added to the original image filename
         and used to save the image after drawing the bounding
         boxes around faces (default : '_faces')
 
@@ -38,7 +39,8 @@ def get_faces(image_name, confidence, image_w_faces='_faces'):
 
     num_faces = 0
     net = cv2.dnn.readNetFromCaffe(PROTO_PATH, MODEL_PATH)
-    image = cv2.imread(path.join(IMAGE_PATH, image_name))
+
+    image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     (height, width) = image.shape[:2]
 
     # PRE-PROCESSING
@@ -52,6 +54,10 @@ def get_faces(image_name, confidence, image_w_faces='_faces'):
     # DETECT FACES
     net.setInput(blob)
     detections = net.forward()
+
+    # detections is a 4d array with the following dimensions
+    # [img, channels, num_detections, property]
+    # property dimension contains stuff like, x, y coordinate, confidence, width, height
 
     # DRAW FACES
     for i in range(detections.shape[2]):
@@ -68,9 +74,14 @@ def get_faces(image_name, confidence, image_w_faces='_faces'):
             cv2.putText(image, text, (start_x, text_y),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
 
-    # cv2.imshow('Faces', image)
-    # cv2.waitKey(0)
-    (name, ext) = path.splitext(image_name)
-    image_w_faces = name + '_faces' + ext
-    cv2.imwrite(path.join(IMAGE_PATH, image_w_faces), image)
+    image_w_faces = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     return image_w_faces, num_faces
+
+def get_img_w_faces(image, confidence):
+    img = np.asarray(Image.open(image))
+
+    return get_faces(img, confidence)
+
+def save_image(image, dir_path, filename):
+    img = Image.fromarray(image)
+    img.save(path.join(dir_path, filename))
