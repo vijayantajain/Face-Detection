@@ -7,7 +7,7 @@ import numpy as np
 from flask import Blueprint, flash, render_template, request
 from flask.views import MethodView
 
-from face_detector.detect.detect_faces import get_img_w_faces, save_image
+from face_detector.detect.detect_faces import FaceDetector
 from face_detector.detect.forms import InputForm, allowed_extension
 
 CWD = os.getcwd()
@@ -69,12 +69,15 @@ class FormView(MethodView):
                     confidence = form.confidence.data
             except KeyError: # TODO - Raise validation error when no image is uploaded
                 filename = DEFAULT_IMAGE
-            image_w_faces, num_faces = get_img_w_faces(image, confidence)
 
-            #Save the image
+            # Get faces
+            detector = FaceDetector(image)
+            image_w_faces, num_faces = detector.get_img_w_faces(confidence=confidence)
+
+            # Save the image
             (name, ext) = path.splitext(image.filename)
             image_w_faces_filename = name + '_faces' + ext
-            save_image(image_w_faces, UPLOAD_FOLDER, image_w_faces_filename)
+            detector.save_image(image_w_faces, UPLOAD_FOLDER, image_w_faces_filename)
 
             return render_template(
                 'faces.html', filename=image_w_faces_filename, num_faces=num_faces)
