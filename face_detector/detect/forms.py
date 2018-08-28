@@ -3,9 +3,30 @@
 from os import path
 
 from flask_wtf import FlaskForm
-from wtforms import FileField, FloatField, validators
+from wtforms import FileField, FloatField, validators, ValidationError
 
 ALLOWED_EXTENSIONS = ['.jpeg', '.jpg', '.png']
+
+def is_image_uploaded(form, field):
+    """Validtor function that ensures that an image
+    is uploaded
+
+    Parameters
+    ----------
+    form : InputForm
+        The form object passed
+    field : FileField
+        The file field in the InputForm class
+
+    Raises
+    ------
+    ValidationError
+        If the image is not uploaded
+    """
+
+
+    if field.data == '':
+        raise ValidationError('Image must be uploaded')
 
 class InputForm(FlaskForm):
     """A WTForm used by Jinja to generate HTML
@@ -19,7 +40,7 @@ class InputForm(FlaskForm):
     confidence = FloatField(
         'Confidence', [validators.DataRequired('Confidence is required and must be a float'),
                        validators.NumberRange(min=0.0, max=0.999)])
-    image = FileField('Upload an Image', )
+    image = FileField('Upload an Image', [is_image_uploaded])
 
 def allowed_extension(filename):
     """Checks the file name of the uploaded image

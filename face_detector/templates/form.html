@@ -13,7 +13,11 @@
                 {{ form.csrf_token }}
 
                 <div class="alert-danger error">
-                    {% if form.confidence.errors %} {% for msgs in form.confidence.errors %} {{ msgs }} {% endfor %} {% endif %}
+                    {% if form.errors is not none %} 
+                        {% for _, val in form.errors.items() %} 
+                            <li>{{ val[0] }}</li>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <div class="md-form">

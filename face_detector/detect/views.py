@@ -3,7 +3,6 @@
 import os
 from os import path
 
-import numpy as np
 from flask import Blueprint, flash, render_template, request
 from flask.views import MethodView
 
@@ -22,7 +21,7 @@ class FormView(MethodView):
     There are two methods `get` and `set` which
     handle the respective request and accordingly
     returns the `render_template` function which
-    renders the required template
+    renders the respective template
     """
 
     def get(self):
@@ -44,15 +43,11 @@ class FormView(MethodView):
         """Handles the POST request from the user
 
         This method handles the request after the form
-        has been filled. First it checks for the validity
-        of the inputs through `form.validate` function. If
-        the input data in the form is correct then it saves
-        the image and calls `get_faces` to get the image file
-        containing the detected faces and the number of faces
-        detected. It then returns the `render_template` function
-        which renders `faces.html` template with the requisite
-        context. In case the form input is not valid it 'flashes'
-        the respective error and renders the 'form.html' template
+        has been filled. It checks for the validity of the
+        input form. In case of an erronous input it renders
+        the same template with errors. In case there are no
+        input errors it then initializes `FaceDetector` to
+        detect faces and then renders that image to the user
 
         Returns
         -------
@@ -63,12 +58,12 @@ class FormView(MethodView):
         form = InputForm(request.form)
 
         if form.validate():
-            try:
-                image = request.files['image']
-                if allowed_extension(image.filename):
-                    confidence = form.confidence.data
-            except KeyError: # TODO - Raise validation error when no image is uploaded
-                filename = DEFAULT_IMAGE
+
+            image = request.files['image']
+            if not allowed_extension(image.filename):
+                return render_template('form.html', form=form)
+
+            confidence = form.confidence.data
 
             # Get faces
             detector = FaceDetector(image)
