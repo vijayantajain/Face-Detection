@@ -213,5 +213,9 @@ class FaceDetector():
             Name of the file by which the method
             will in `dir_path`
         """
+        try:
+            assert path.isdir(dir_path)
+        except AssertionError:
+            os.mkdir(dir_path)
         img = Image.fromarray(image)
         img.save(path.join(dir_path, filename))

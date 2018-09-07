@@ -10,7 +10,10 @@ CWD = os.getcwd()
 INSTANCE_PATH = path.join(CWD, 'instance')
 
 app = Flask(__name__, instance_path=INSTANCE_PATH, instance_relative_config=True)
-app.config.from_pyfile('config.py')
+try:
+    app.config.from_pyfile('config.py')
+except FileNotFoundError:
+    app.config['SECRET_KEY'] = 'Random Secret key'
 app.register_blueprint(detect_faces)
 
 @app.errorhandler(404)
